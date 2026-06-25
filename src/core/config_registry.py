@@ -18,7 +18,7 @@ from src.config import (
 from src.notification_noise import NOTIFICATION_SEVERITIES
 from src.notification_routing import ROUTABLE_NOTIFICATION_CHANNELS
 
-SCHEMA_VERSION = "2026-05-25"
+SCHEMA_VERSION = "2026-06-23-local-cli-backend"
 
 _CATEGORY_DEFINITIONS: List[Dict[str, Any]] = [
     {
@@ -116,6 +116,153 @@ _FIELD_DEFINITIONS: Dict[str, Dict[str, Any]] = {
     # ------------------------------------------------------------------
     # AI Model – LiteLLM unified config
     # ------------------------------------------------------------------
+    "GENERATION_BACKEND": {
+        "title": "Analysis Generation Method",
+        "description": "Generation method used by stock analysis, market reviews, and regular text generation.",
+        "category": "ai_model",
+        "data_type": "string",
+        "ui_control": "select",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "litellm",
+        "options": [
+            {"label": "Default model settings", "value": "litellm"},
+            {"label": "Codex CLI (experimental)", "value": "codex_cli"},
+        ],
+        "validation": {"enum": ["litellm", "codex_cli"]},
+        "display_order": 0,
+        "help_key": "settings.ai_model.GENERATION_BACKEND",
+        "examples": ["GENERATION_BACKEND=litellm", "GENERATION_BACKEND=codex_cli"],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
+            },
+        ],
+        "warning_codes": [],
+    },
+    "GENERATION_FALLBACK_BACKEND": {
+        "title": "Fallback Generation Method",
+        "description": "Backend-level fallback method. Empty disables backend fallback; litellm can be used as fallback for Codex CLI.",
+        "category": "ai_model",
+        "data_type": "string",
+        "ui_control": "select",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "litellm",
+        "options": [
+            {"label": "Disabled", "value": ""},
+            {"label": "Default model settings", "value": "litellm"},
+        ],
+        "validation": {"enum": ["", "litellm"]},
+        "display_order": 0,
+        "help_key": "settings.ai_model.GENERATION_FALLBACK_BACKEND",
+        "examples": ["GENERATION_FALLBACK_BACKEND=litellm", "GENERATION_FALLBACK_BACKEND="],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
+            },
+        ],
+        "warning_codes": [],
+    },
+    "GENERATION_BACKEND_TIMEOUT_SECONDS": {
+        "title": "Generation Backend Timeout",
+        "description": "Maximum seconds allowed for one generation backend call. Applies to local CLI backends; LiteLLM behavior is unchanged.",
+        "category": "ai_model",
+        "data_type": "integer",
+        "ui_control": "number",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "300",
+        "options": [],
+        "validation": {"min": 1, "max": 3600},
+        "display_order": 1,
+        "help_key": "settings.ai_model.GENERATION_BACKEND_TIMEOUT_SECONDS",
+        "examples": ["GENERATION_BACKEND_TIMEOUT_SECONDS=300"],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
+            },
+        ],
+        "warning_codes": [],
+    },
+    "GENERATION_BACKEND_MAX_OUTPUT_BYTES": {
+        "title": "Generation Backend Max Output Bytes",
+        "description": (
+            "Maximum captured diagnostic stdout/stderr and final-response bytes "
+            "for one local CLI backend call."
+        ),
+        "category": "ai_model",
+        "data_type": "integer",
+        "ui_control": "number",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "1048576",
+        "options": [],
+        "validation": {"min": 1, "max": 33554432},
+        "display_order": 1,
+        "help_key": "settings.ai_model.GENERATION_BACKEND_MAX_OUTPUT_BYTES",
+        "examples": ["GENERATION_BACKEND_MAX_OUTPUT_BYTES=1048576"],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
+            },
+        ],
+        "warning_codes": [],
+    },
+    "GENERATION_BACKEND_MAX_CONCURRENCY": {
+        "title": "Generation Backend Max Concurrency",
+        "description": "Global generation backend concurrency cap. Local CLI effective concurrency also respects LOCAL_CLI_BACKEND_MAX_CONCURRENCY.",
+        "category": "ai_model",
+        "data_type": "integer",
+        "ui_control": "number",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "1",
+        "options": [],
+        "validation": {"min": 1, "max": 16},
+        "display_order": 1,
+        "help_key": "settings.ai_model.GENERATION_BACKEND_MAX_CONCURRENCY",
+        "examples": ["GENERATION_BACKEND_MAX_CONCURRENCY=1"],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
+            },
+        ],
+        "warning_codes": [],
+    },
+    "LOCAL_CLI_BACKEND_MAX_CONCURRENCY": {
+        "title": "Local CLI Backend Max Concurrency",
+        "description": "Local CLI backend concurrency cap. Effective local CLI concurrency is the minimum of this value and GENERATION_BACKEND_MAX_CONCURRENCY.",
+        "category": "ai_model",
+        "data_type": "integer",
+        "ui_control": "number",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "1",
+        "options": [],
+        "validation": {"min": 1, "max": 4},
+        "display_order": 1,
+        "help_key": "settings.ai_model.LOCAL_CLI_BACKEND_MAX_CONCURRENCY",
+        "examples": ["LOCAL_CLI_BACKEND_MAX_CONCURRENCY=1"],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
+            },
+        ],
+        "warning_codes": [],
+    },
     "LITELLM_MODEL": {
         "title": "Primary Model",
         "description": "Primary model in provider/model format (e.g. gemini/gemini-3.1-pro-preview, deepseek/deepseek-v4-flash, anthropic/claude-sonnet-4-6). If empty, it is auto-inferred from available API keys or channel declarations.",
@@ -3493,6 +3640,35 @@ _FIELD_DEFINITIONS: Dict[str, Dict[str, Any]] = {
             {
                 "label": "完整指南：Agent 配置",
                 "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/full-guide.md#环境变量完整列表",
+            },
+        ],
+        "warning_codes": [],
+    },
+    "AGENT_GENERATION_BACKEND": {
+        "title": "Ask-Stock Generation Method",
+        "description": "Generation method used by the ask-stock assistant to generate replies and use tools.",
+        "category": "agent",
+        "data_type": "string",
+        "ui_control": "select",
+        "is_sensitive": False,
+        "is_required": False,
+        "is_editable": True,
+        "default_value": "auto",
+        "options": [
+            {"label": "Auto", "value": "auto"},
+            {"label": "Default model settings", "value": "litellm"},
+        ],
+        "validation": {"enum": ["auto", "litellm"]},
+        "display_order": 2,
+        "help_key": "settings.agent.AGENT_GENERATION_BACKEND",
+        "examples": [
+            "AGENT_GENERATION_BACKEND=auto",
+            "AGENT_GENERATION_BACKEND=litellm",
+        ],
+        "docs": [
+            {
+                "label": "LLM 配置指南",
+                "href": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/main/docs/LLM_CONFIG_GUIDE.md",
             },
         ],
         "warning_codes": [],
